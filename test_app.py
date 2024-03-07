@@ -43,7 +43,28 @@ class FlaskTestCase(unittest.TestCase):
         self.assertEqual(del_response.status_code, 204)
         get_response = self.app.get('/users/1')
         self.assertEqual(get_response.status_code, 404)
+    def test_update_user(self):
+        create_response = self.app.post('/users', json={
+            'firstName': 'Update',
+            'lastName': 'Me',
+            'birthYear': 1990,
+            'group': 'user'
+        })
+        self.assertEqual(create_response.status_code, 201)
+        user_id = create_response.json['id']
+
+        update_response = self.app.patch(f'/users/{user_id}', json={
+            'firstName': 'Updated',
+            'lastName': 'Successfully'
+        })
+        self.assertEqual(update_response.status_code, 200)
+        self.assertEqual(update_response.json['firstName'], 'Updated')
+        self.assertEqual(update_response.json['lastName'], 'Successfully')
+
+        get_response = self.app.get(f'/users/{user_id}')
+        self.assertEqual(get_response.status_code, 200)
+        self.assertEqual(get_response.json['firstName'], 'Updated')
+        self.assertEqual(get_response.json['lastName'], 'Successfully')
 
 if __name__ == '__main__':
     unittest.main()
-# jakiś drugi useless komentarze 
